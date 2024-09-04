@@ -23,14 +23,11 @@ export function generateSetlist(hour: number, userId: number) {
   const respectSongs = findMatchingSongs(user, otherUser, 'respect');
   const selfDisclosureSongs = findMatchingSongs(user, otherUser, 'selfDisclosure');
 
-  const setlist: Song[] = [];
-  const pattern = [
-    'common', 'common', 'common', 'respect', 'common', 'common',
-    'selfDisclosure', 'common', 'respect', 'selfDisclosure', 'common', 'common'
-  ];
+  const setlist: { song: Song; type: MatchType }[] = [];
+  const pattern = generateFlexiblePattern(totalSongs);
 
   for (let i = 0; i < totalSongs; i++) {
-    const matchType = pattern[i % pattern.length] as MatchType;
+    const matchType = pattern[i];
     let selectedSong: Song | undefined;
 
     switch (matchType) {
@@ -49,11 +46,64 @@ export function generateSetlist(hour: number, userId: number) {
     }
 
     if (selectedSong) {
-      setlist.push(selectedSong);
+      setlist.push({ song: selectedSong, type: matchType });
     }
   }
 
   return setlist;
+}
+
+function generateFlexiblePattern(totalSongs: number): MatchType[] {
+  const pattern: MatchType[] = [];
+  let commonCount = 0;
+  let respectCount = 0;
+  let selfDisclosureCount = 0;
+
+  for (let i = 0; i < totalSongs; i++) {
+    const totalCount = commonCount + respectCount + selfDisclosureCount;
+    const commonRatio = commonCount / totalCount || 0;
+    const respectRatio = respectCount / totalCount || 0;
+    const selfDisclosureRatio = selfDisclosureCount / totalCount || 0;
+
+    let nextType: MatchType;
+
+    if (i < 3 || i === totalSongs - 1) {
+      // 最初の3曲は必ず 'common'
+      nextType = 'common';
+    } else if (commonRatio < 0.5) {
+      // 'common' の割合が50%未満の場合、'common' を優先
+      nextType = 'common';
+    } else if (respectRatio < 0.2) {
+      // 'respect' の割合が20%未満の場合、'respect' を優先
+      nextType = 'respect';
+    } else if (selfDisclosureRatio < 0.2) {
+      // 'selfDisclosure' の割合が20%未満の場合、'selfDisclosure' を優先
+      nextType = 'selfDisclosure';
+    } else {
+      // それ以外の場合、ランダムに選択（ただし、同じタイプが3回連続しないようにする）
+      const lastTwo = pattern.slice(-2);
+      const availableTypes = ['common', 'respect', 'selfDisclosure'].filter(
+        type => !lastTwo.every(t => t === type)
+      ) as MatchType[];
+      nextType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+    }
+
+    pattern.push(nextType);
+
+    switch (nextType) {
+      case 'common':
+        commonCount++;
+        break;
+      case 'respect':
+        respectCount++;
+        break;
+      case 'selfDisclosure':
+        selfDisclosureCount++;
+        break;
+    }
+  }
+
+  return pattern;
 }
 
 function findMatchingSongs(user: typeof users[0], otherUser: typeof users[0], matchType: MatchType): Song[] {
