@@ -38,15 +38,17 @@ const SetlistDisplay: React.FC<SetlistDisplayProps> = ({ setlist }) => {
       <h2 className="text-2xl font-bold mb-4">セットリスト ({setlist.length} 曲)</h2>
       <ul className="space-y-2">
         {setlist.map((item, index) => (
-          <li key={index} className="border-b pb-2">
-            <span className="font-bold">{index + 1}.</span>{' '}
-            <span className="font-semibold">{item.song.title}</span>{' '}
-            <span className="text-gray-600">- {getArtistName(item.song.artistId)}</span>{' '}
-            <span className={`font-bold ${item.type === 'common' ? 'text-green-600' :
-              item.type === 'respect' ? 'text-blue-600' :
-                'text-red-600'
+          <li key={index} className="border-b pb-2 flex justify-between items-center">
+            <div>
+              <span className="font-bold">{index + 1}.</span>{' '}
+              <span className="font-semibold">{item.song.title}</span>{' '}
+              <span className="text-gray-400">- {getArtistName(item.song.artistId)}</span>
+            </div>
+            <span className={`font-bold ml-2 ${item.type === 'common' ? 'text-green-400' :
+              item.type === 'respect' ? 'text-blue-400' :
+                'text-red-400'
               }`}>
-              ({getTypeLabel(item.type)})
+              {getTypeLabel(item.type)}
             </span>
           </li>
         ))}
