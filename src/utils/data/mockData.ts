@@ -12,7 +12,7 @@ export const artists = [
   { id: 11, name: '米津玄師' },
   { id: 12, name: '陰陽座' },
   { id: 13, name: 'バルーン' },
-  { id: 14, name: 'RADWIMPS' },
+  { id: 14, name: 'SPYAIR' },
   { id: 15, name: 'あいみょん' },
   { id: 16, name: 'LiSA' },
   { id: 17, name: 'フレデリック' },

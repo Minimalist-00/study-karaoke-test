@@ -3,52 +3,109 @@
 */
 
 import { MatchType, Song } from '@/types/setlist';
-import { songs, users } from '@/utils/data/mockData';
+import { artists, songs, users } from '@/utils/data/mockData';
 
-export function generateSetlist(hour: number, userId: number) {
-  const songsPerHour = 6; // 1時間あたりの曲数
-  const totalSongs = Math.round(hour * songsPerHour);
+// グローバル変数として分類結果を保持
+const classifiedSongs: Record<MatchType, Song[]> = {
+  common: [],
+  respect: [],
+  selfDisclosure: []
+};
 
-  const user = users.find(u => u.id === userId);
-  const otherUser = users.find(u => u.id !== userId);
+// 即時実行関数で全曲を分類
+(function classifyAllSongs() {
+  const user = users[0];  // ユーザーAとする
+  const otherUser = users[1];  // ユーザーBとする
 
-  if (!user || !otherUser) {
-    throw new Error('User not found');
+  for (const song of songs) {
+    const userLikesSong = user.favoriteSongs.includes(song.id);
+    const otherUserLikesSong = otherUser.favoriteSongs.includes(song.id);
+    const userLikesArtist = user.favoriteArtists.includes(song.artistId);
+    const otherUserLikesArtist = otherUser.favoriteArtists.includes(song.artistId);
+
+    if (isCommon(userLikesSong, otherUserLikesSong, userLikesArtist, otherUserLikesArtist)) {
+      classifiedSongs.common.push(song);
+    } else if (isRespect(userLikesSong, otherUserLikesSong, userLikesArtist, otherUserLikesArtist)) {
+      classifiedSongs.respect.push(song);
+    } else if (isSelfDisclosure(userLikesSong, otherUserLikesSong, userLikesArtist, otherUserLikesArtist)) {
+      classifiedSongs.selfDisclosure.push(song);
+    }
   }
 
-  const commonSongs = findMatchingSongs(user, otherUser, 'common');
-  const respectSongs = findMatchingSongs(user, otherUser, 'respect');
-  const selfDisclosureSongs = findMatchingSongs(user, otherUser, 'selfDisclosure');
+  // 分類結果を表示
+  console.log('全曲の分類結果:');
+  Object.entries(classifiedSongs).forEach(([category, songs]) => {
+    console.log(`\n${category.toUpperCase()}:`);
+    songs.forEach(song => {
+      const artist = artists.find(a => a.id === song.artistId);
+      console.log(`- ${song.title} (${artist ? artist.name : 'Unknown Artist'})`);
+    });
+  });
+})();
+
+export function generateSetlist(hour: number, userId: number) {
+  const songsPerHour = 6;
+  const totalSongs = Math.round(hour * songsPerHour);
 
   const setlist: { song: Song; type: MatchType }[] = [];
   const pattern = generateFlexiblePattern(totalSongs);
 
-  for (let i = 0; i < totalSongs; i++) {
-    const matchType = pattern[i];
-    let selectedSong: Song | undefined;
+  const shuffledCommon = shuffleArray([...classifiedSongs.common]);
+  const shuffledRespect = shuffleArray([...classifiedSongs.respect]);
+  const shuffledSelfDisclosure = shuffleArray([...classifiedSongs.selfDisclosure]);
 
-    switch (matchType) {
+  for (let i = 0; i < totalSongs; i++) {
+    const desiredType = pattern[i];
+    let selectedSong: Song | undefined;
+    let actualType: MatchType = desiredType;
+
+    switch (desiredType) {
       case 'common':
-        selectedSong = commonSongs.pop();
-        if (!selectedSong) selectedSong = respectSongs.pop() || selfDisclosureSongs.pop();
+        selectedSong = shuffledCommon.pop();
+        if (!selectedSong) {
+          selectedSong = shuffledRespect.pop();
+          if (selectedSong) {
+            actualType = 'respect';
+          } else {
+            selectedSong = shuffledSelfDisclosure.pop();
+            if (selectedSong) actualType = 'selfDisclosure';
+          }
+        }
         break;
       case 'respect':
-        selectedSong = respectSongs.pop();
-        if (!selectedSong) selectedSong = commonSongs.pop() || selfDisclosureSongs.pop();
+        selectedSong = shuffledRespect.pop();
+        if (!selectedSong) {
+          selectedSong = shuffledCommon.pop();
+          if (selectedSong) {
+            actualType = 'common';
+          } else {
+            selectedSong = shuffledSelfDisclosure.pop();
+            if (selectedSong) actualType = 'selfDisclosure';
+          }
+        }
         break;
       case 'selfDisclosure':
-        selectedSong = selfDisclosureSongs.pop();
-        if (!selectedSong) selectedSong = commonSongs.pop() || respectSongs.pop();
+        selectedSong = shuffledSelfDisclosure.pop();
+        if (!selectedSong) {
+          selectedSong = shuffledCommon.pop();
+          if (selectedSong) {
+            actualType = 'common';
+          } else {
+            selectedSong = shuffledRespect.pop();
+            if (selectedSong) actualType = 'respect';
+          }
+        }
         break;
     }
 
     if (selectedSong) {
-      setlist.push({ song: selectedSong, type: matchType });
+      setlist.push({ song: selectedSong, type: actualType });
     }
   }
-
   return setlist;
 }
+
+// その他の関数（generateFlexiblePattern, isCommon, isRespect, isSelfDisclosure, shuffleArray）は変更なし
 
 function generateFlexiblePattern(totalSongs: number): MatchType[] {
   const pattern: MatchType[] = [];
