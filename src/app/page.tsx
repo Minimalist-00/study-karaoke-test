@@ -3,17 +3,9 @@
 import Footer from '@/components/Footer';
 import SetlistDisplay from '@/components/SetlistDisplay';
 import SetlistGenerator from '@/components/SetlistGenerator';
+import { SetlistItem } from '@/types/setlist';
 import { generateSetlist } from '@/utils/setlist/setlists';
 import { useState } from 'react';
-
-type SetlistItem = {
-  song: {
-    id: number;
-    title: string;
-    artistId: number;
-  };
-  type: 'common' | 'respect' | 'selfDisclosure';
-};
 
 export default function Home() {
   const [setlist, setSetlist] = useState<SetlistItem[]>([]);

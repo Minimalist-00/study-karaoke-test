@@ -2,15 +2,8 @@
  * セットリストを生成するアルゴリズム
 */
 
+import { MatchType, Song } from '@/types/setlist';
 import { songs, users } from '@/utils/data/mockData';
-
-type Song = {
-  id: number;
-  title: string;
-  artistId: number;
-};
-
-type MatchType = 'common' | 'respect' | 'selfDisclosure';
 
 export function generateSetlist(hour: number, userId: number) {
   const songsPerHour = 6; // 1時間あたりの曲数

@@ -1,11 +1,5 @@
+import { SetlistGeneratorProps } from '@/types/setlist';
 import React from 'react';
-
-type SetlistGeneratorProps = {
-  hour: number;
-  setHour: (hour: number) => void;
-  onGenerate: () => void;
-  setlistLength: number;
-};
 
 const SetlistGenerator: React.FC<SetlistGeneratorProps> = ({ hour, setHour, onGenerate, setlistLength }) => {
   return (

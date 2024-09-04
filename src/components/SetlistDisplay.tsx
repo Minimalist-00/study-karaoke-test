@@ -1,18 +1,6 @@
+import { SetlistDisplayProps } from '@/types/setlist';
 import { artists } from '@/utils/data/mockData';
 import React from 'react';
-
-type SetlistItem = {
-  song: {
-    id: number;
-    title: string;
-    artistId: number;
-  };
-  type: 'common' | 'respect' | 'selfDisclosure';
-};
-
-type SetlistDisplayProps = {
-  setlist: SetlistItem[];
-};
 
 const SetlistDisplay: React.FC<SetlistDisplayProps> = ({ setlist }) => {
   const getTypeLabel = (type: string) => {
