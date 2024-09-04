@@ -1,3 +1,7 @@
+/*
+ * セットリストを生成するアルゴリズム
+*/
+
 import { songs, users } from '@/utils/data/mockData';
 
 type Song = {
