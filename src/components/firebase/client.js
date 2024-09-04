@@ -1,6 +1,3 @@
-import { getApps, initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -15,14 +12,9 @@ const firebaseConfig = {
 export let firebaseApp = !getApps().length
   ? initializeApp(firebaseConfig)
   : getApps()[0];
-
 export function initFirebase() {
   firebaseApp = !getApps().length
     ? initializeApp(firebaseConfig)
     : getApps()[0];
 }
-
-// Initialize Firestore
-export const db = getFirestore(firebaseApp);
-
 // const analytics = getAnalytics(firebaseApp);
