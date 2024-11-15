@@ -19,7 +19,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center pb-10">
-      <h1 className="text-4xl font-bold mb-8">karaoke setlist app</h1>
+      <h1 className="text-4xl font-bold mb-8">karaoke Recommend</h1>
       <SetlistGenerator
         hour={hour}
         setHour={setHour}
