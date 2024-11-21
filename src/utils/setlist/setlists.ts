@@ -3,7 +3,7 @@
 */
 
 import { MatchType, Song } from '@/types/setlist';
-import { artists, songs, users } from '@/utils/data/mockData';
+import { songs, users } from '@/utils/data/mockData';
 
 // グローバル変数として分類結果を保持
 const classifiedSongs: Record<MatchType, Song[]> = {
@@ -33,14 +33,15 @@ const classifiedSongs: Record<MatchType, Song[]> = {
   }
 
   // 分類結果を表示
-  console.log('全曲の分類結果:');
-  Object.entries(classifiedSongs).forEach(([category, songs]) => {
-    console.log(`\n${category.toUpperCase()}:`);
-    songs.forEach(song => {
-      const artist = artists.find(a => a.id === song.artistId);
-      console.log(`- ${song.title} (${artist ? artist.name : 'Unknown Artist'})`);
-    });
-  });
+  //   console.log('全曲の分類結果:');
+  //   Object.entries(classifiedSongs).forEach(([category, songs]) => {
+  //     console.log(`\n${category.toUpperCase()}:`);
+  //     songs.forEach(song => {
+  //       const artist = artists.find(a => a.id === song.artistId);
+  //       console.log(`- ${song.title} (${artist ? artist.name : 'Unknown Artist'})`);
+  //     });
+  //   }
+  // );
 })();
 
 export function generateSetlist(hour: number, userId: number) {
